@@ -1,0 +1,9 @@
+#!/bin/bash -e
+# Wrapper to deal with basic tasks
+
+exec ./hooks/config-changed.real
+
+cp /etc/neutron/plugins/ml2/ml2_conf.ini-vpp /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i "16s/.*/interface_driver = linuxbridge/" /etc/neutron/l3_agent.ini
+sed -i "16s/.*/interface_driver = linuxbridge/" /etc/neutron/dhcp_agent.ini
+systemctl restart neutron-server

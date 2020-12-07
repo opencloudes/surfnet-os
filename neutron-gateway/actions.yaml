@@ -1,0 +1,8 @@
+openstack-upgrade:
+  description: Perform openstack upgrades. Config option action-managed-upgrade must be set to True.
+pause:
+    description: Pause the neutron-gateway unit.
+resume:
+    descrpition: Resume the neutron-gateway unit.
+security-checklist:
+  description: Validate the running configuration against the OpenStack security guides checklist

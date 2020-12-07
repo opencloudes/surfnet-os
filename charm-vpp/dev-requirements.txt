@@ -1,0 +1,4 @@
+charmhelpers
+# zaza
+git+https://github.com/CanonicalBootStack/zaza.git#egg=zaza
+

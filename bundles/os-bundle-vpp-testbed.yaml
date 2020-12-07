@@ -1,0 +1,829 @@
+series: bionic
+applications:
+  ceph-mon:
+    charm: cs:ceph-mon-48
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      config-flags: '{''global'': {''mon max pg per osd'': 100000}}'
+      customize-failure-domain: false
+      expected-osd-count: 2
+      loglevel: 10
+      monitor-count: 3
+      nagios_degraded_thresh: 1
+      nagios_misplaced_thresh: 0.1
+      nagios_recovery_rate: "0"
+      source: cloud:bionic-train
+    annotations:
+      gui-x: "750"
+      gui-y: "500"
+    bindings:
+      "": internal-api
+      admin: external-api
+      bootstrap-source: internal-api
+      client: storage-service
+      cluster: storage-cluster
+      mds: internal-api
+      mon: internal-api
+      nrpe-external-master: internal-api
+      osd: storage-cluster
+      prometheus: internal-api
+      public: storage-service
+      radosgw: internal-api
+      rbd-mirror: internal-api
+  ceph-osd:
+    charm: cs:ceph-osd-303
+    num_units: 2
+    to:
+    - "3"
+    - "4"
+    options:
+      aa-profile-mode: disable
+      autotune: true
+      bluestore: true
+      crush-initial-weight: 0.01
+      customize-failure-domain: false
+      loglevel: 10
+      osd-devices: /dev/sda /dev/sdb /dev/sdc
+      osd-max-backfills: 1
+      osd-recovery-max-active: 1
+      source: cloud:bionic-train
+      sysctl: '{ kernel.pid_max : 2097152, vm.max_map_count : 524288, kernel.threads-max:
+        2097152, vm.vfs_cache_pressure: 100, vm.swappiness: 1, net.core.wmem_max:
+        524287, net.core.optmem_max: 524287, net.core.netdev_max_backlog: 300000,
+        net.ipv4.tcp_sack: 1, net.ipv4.tcp_low_latency: 1, net.ipv4.tcp_adv_win_scale:
+        1, net.core.rmem_max: 268435456, net.core.wmem_max: 268435456, net.ipv4.tcp_rmem:
+        4096 87380 134217728, net.ipv4.tcp_wmem: 4096 65536 134217728, net.ipv4.tcp_no_metrics_save:
+        1, net.core.netdev_max_backlog: 250000, net.ipv4.tcp_congestion_control: bbr,
+        net.core.default_qdisc: fq, kernel.msgmnb = 65536, kernel.msgmax = 65536,
+        kernel.shmmax = 68719476736, kernel.shmall = 4294967296 }'
+    annotations:
+      gui-x: "1000"
+      gui-y: "500"
+    bindings:
+      "": internal-api
+      cluster: storage-cluster
+      mon: storage-service
+      nrpe-external-master: external-api
+      public: storage-service
+      secrets-storage: internal-api
+  cinder:
+    charm: cs:cinder-303
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      block-device: None
+      config-flags: max_overflow=100
+      debug: true
+      glance-api-version: 2
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: volumes.nfv.dcn.surf.net
+      os-internal-hostname: volumes.nfv.dcn.surf.net
+      os-public-hostname: volumes.nfv.dcn.surf.net
+      region: RegionOne
+      use-internal-endpoints: true
+      vip: 145.145.72.112 10.0.92.112
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "1368"
+      gui-y: "1058.3203230275508"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      amqp: internal-api
+      backup-backend: internal-api
+      ceph: storage-service
+      certificates: internal-api
+      cinder-volume-service: internal-api
+      cluster: internal-api
+      ha: internal-api
+      identity-service: internal-api
+      image-service: internal-api
+      internal: internal-api
+      nrpe-external-master: internal-api
+      public: external-api
+      shared-db: internal-api
+      storage-backend: storage-service
+  cinder-ceph:
+    charm: cs:cinder-ceph-256
+    options:
+      ceph-osd-replication-count: 4
+      restrict-ceph-pools: false
+    annotations:
+      gui-x: "750"
+      gui-y: "250"
+    bindings:
+      "": alpha
+      ceph: alpha
+      ceph-access: alpha
+      juju-info: alpha
+      storage-backend: alpha
+  etcd:
+    charm: cs:etcd-501
+    num_units: 3
+    to:
+    - lxd:1
+    - lxd:0
+    - lxd:2
+    options:
+      channel: 3.1/stable
+    annotations:
+      gui-x: "1568"
+      gui-y: "19.089838486224608"
+    bindings:
+      "": internal-api
+      certificates: internal-api
+      cluster: internal-api
+      db: internal-api
+      nrpe-external-master: external-api
+      proxy: internal-api
+  glance:
+    charm: cs:glance-297
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      ceph-osd-replication-count: 4
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: images.nfv.dcn.surf.net
+      os-internal-hostname: images.nfv.dcn.surf.net
+      os-public-hostname: images.nfv.dcn.surf.net
+      region: RegionOne
+      restrict-ceph-pools: false
+      use-internal-endpoints: true
+      vip: 145.145.72.120 10.0.92.120
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "250"
+      gui-y: "0"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      amqp: internal-api
+      ceph: storage-service
+      certificates: internal-api
+      cinder-volume-service: internal-api
+      cluster: internal-api
+      ha: internal-api
+      identity-service: internal-api
+      image-service: internal-api
+      internal: internal-api
+      nrpe-external-master: internal-api
+      object-store: internal-api
+      public: external-api
+      shared-db: internal-api
+      storage-backend: storage-service
+  hacluster-cinder:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "-32"
+      gui-y: "-673.7304845413264"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-glance:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "-432"
+      gui-y: "19.089838486224608"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-heat:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "-432"
+      gui-y: "711.9101615137754"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-horizon:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "-232"
+      gui-y: "1058.3203230275508"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-keystone:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "-32"
+      gui-y: "1404.7304845413262"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-mysql:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "368.00000000000006"
+      gui-y: "1404.7304845413262"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-neutron:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "768"
+      gui-y: "1404.7304845413264"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-nova:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "1168"
+      gui-y: "1404.7304845413262"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  hacluster-placement:
+    charm: cs:hacluster-68
+    options:
+      cluster_count: 3
+    annotations:
+      gui-x: "1568"
+      gui-y: "1404.7304845413264"
+    bindings:
+      "": alpha
+      ha: alpha
+      hanode: alpha
+      juju-info: alpha
+      nrpe-external-master: alpha
+      pacemaker-remote: alpha
+      peer-availability: alpha
+  heat:
+    charm: cs:heat-276
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: heat.nfv.dcn.surf.net
+      os-internal-hostname: heat.nfv.dcn.surf.net
+      os-public-hostname: heat.nfv.dcn.surf.net
+      region: RegionOne
+      use-internal-endpoints: true
+      vip: 145.145.72.119 10.0.92.119
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "1968"
+      gui-y: "711.9101615137754"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      amqp: internal-api
+      certificates: internal-api
+      cluster: internal-api
+      ha: internal-api
+      heat-plugin-subordinate: internal-api
+      identity-service: internal-api
+      internal: internal-api
+      public: external-api
+      shared-db: internal-api
+  keystone:
+    charm: cs:keystone-314
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: auth.nfv.dcn.surf.net
+      os-internal-hostname: auth.nfv.dcn.surf.net
+      os-public-hostname: auth.nfv.dcn.surf.net
+      preferred-api-version: 3
+      region: RegionOne
+      vip: 145.145.72.111 10.0.92.111
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "1968"
+      gui-y: "19.08983848622455"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      certificates: internal-api
+      cluster: internal-api
+      domain-backend: internal-api
+      ha: internal-api
+      identity-admin: internal-api
+      identity-credentials: internal-api
+      identity-notifications: internal-api
+      identity-service: internal-api
+      internal: internal-api
+      keystone-fid-service-provider: internal-api
+      keystone-middleware: internal-api
+      nrpe-external-master: internal-api
+      public: external-api
+      shared-db: internal-api
+      websso-trusted-dashboard: external-api
+  mysql:
+    charm: cs:percona-cluster-281
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      enable-binlogs: true
+      innodb-buffer-pool-size: 512M
+      max-connections: 2000
+      min-cluster-size: 3
+      performance-schema: true
+      tuning-level: unsafe
+      vip: 10.0.92.124
+      wait-timeout: 3600
+    annotations:
+      gui-x: "1768"
+      gui-y: "-327.3203230275508"
+    bindings:
+      "": internal-api
+      access: internal-api
+      cluster: internal-api
+      db: internal-api
+      db-admin: internal-api
+      ha: internal-api
+      master: internal-api
+      nrpe-external-master: external-api
+      shared-db: internal-api
+      slave: internal-api
+  neutron-api:
+    charm: local:bionic/neutron-api-1
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      default-tenant-network-type: vlan
+      dhcp-agents-per-network: 3
+      dns-domain: ""
+      enable-l3ha: true
+      enable-ml2-dns: false
+      enable-ml2-port-security: true
+      flat-network-providers: '*'
+      ipv4-ptr-zone-prefix-size: 24
+      ipv6-ptr-zone-prefix-size: 64
+      l2-population: true
+      neutron-plugin: ovs
+      neutron-security-groups: false
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: neutron.nfv.dcn.surf.net
+      os-internal-hostname: neutron.nfv.dcn.surf.net
+      os-public-hostname: neutron.nfv.dcn.surf.net
+      overlay-network-type: vxlan gre
+      path-mtu: 9128
+      region: RegionOne
+      reverse-dns-lookup: true
+      use-internal-endpoints: true
+      vip: 145.145.72.113 10.0.92.113
+      vlan-ranges: physnet1:2:4000
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "1568"
+      gui-y: "-673.7304845413262"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      amqp: internal-api
+      certificates: internal-api
+      cluster: internal-api
+      etcd-proxy: internal-api
+      external-dns: internal-api
+      ha: internal-api
+      identity-service: internal-api
+      infoblox-neutron: internal-api
+      internal: internal-api
+      midonet: internal-api
+      neutron-api: internal-api
+      neutron-load-balancer: internal-api
+      neutron-plugin-api: internal-api
+      neutron-plugin-api-subordinate: internal-api
+      nrpe-external-master: internal-api
+      public: external-api
+      shared-db: internal-api
+      vsd-rest-api: internal-api
+  neutron-gateway:
+    charm: local:bionic/neutron-gateway-64
+    num_units: 2
+    to:
+    - "3"
+    - "4"
+    options:
+      aa-profile-mode: complain
+      bridge-mappings: physnet1:br-data
+      data-port: br-data:bond1
+      dns-servers: 145.145.75.4
+      enable-isolated-metadata: true
+      enable-metadata-network: true
+      openstack-origin: cloud:bionic-train
+      sysctl: '{ net.ipv4.neigh.default.gc_thresh1 : 128, net.ipv4.neigh.default.gc_thresh2
+        : 28672, net.ipv4.neigh.default.gc_thresh3 : 32768, net.ipv6.neigh.default.gc_thresh1
+        : 128, net.ipv6.neigh.default.gc_thresh2 : 28672, net.ipv6.neigh.default.gc_thresh3
+        : 32768, net.nf_conntrack_max : 1000000, net.netfilter.nf_conntrack_buckets
+        : 204800, net.netfilter.nf_conntrack_max : 1000000 }'
+      vlan-ranges: physnet1:1050:1050
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "-632"
+      gui-y: "1058.320323027551"
+    bindings:
+      "": internal-api
+      amqp: internal-api
+      amqp-nova: internal-api
+      cluster: internal-api
+      data: internal-api
+      ha: internal-api
+      neutron-plugin-api: internal-api
+      nrpe-external-master: internal-api
+      quantum-network-service: internal-api
+  nova-cloud-controller:
+    charm: cs:nova-cloud-controller-345
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      console-access-protocol: novnc
+      console-proxy-ip: local
+      cpu-allocation-ratio: 1
+      debug: true
+      disk-allocation-ratio: 1
+      network-manager: Neutron
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: ncc.nfv.dcn.surf.net
+      os-internal-hostname: ncc.nfv.dcn.surf.net
+      os-public-hostname: ncc.nfv.dcn.surf.net
+      ram-allocation-ratio: 0.9
+      region: RegionOne
+      scheduler-default-filters: AggregateInstanceExtraSpecsFilter,RetryFilter,AvailabilityZoneFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter,NUMATopologyFilter
+      use-internal-endpoints: true
+      vip: 145.145.72.121 10.0.92.121
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "0"
+      gui-y: "500"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      amqp: internal-api
+      amqp-cell: internal-api
+      certificates: internal-api
+      cinder-volume-service: internal-api
+      cloud-compute: internal-api
+      cloud-controller: internal-api
+      cluster: internal-api
+      ha: internal-api
+      identity-service: internal-api
+      image-service: internal-api
+      internal: internal-api
+      memcache: internal-api
+      neutron-api: internal-api
+      nova-cell-api: internal-api
+      nova-vmware: internal-api
+      nrpe-external-master: internal-api
+      placement: internal-api
+      public: external-api
+      quantum-network-service: internal-api
+      shared-db: internal-api
+      shared-db-cell: internal-api
+  nova-compute:
+    charm: local:bionic/nova-compute-133
+    num_units: 2
+    to:
+    - "3"
+    - "4"
+    options:
+      aa-profile-mode: complain
+      config-flags: block_device_allocate_retries=180
+      cpu-mode: host-passthrough
+      enable-live-migration: true
+      enable-resize: true
+      encrypt: false
+      ephemeral-device: /dev/md3
+      hugepages: "55000"
+      ksm: "0"
+      libvirt-image-backend: qcow2
+      live-migration-permit-auto-converge: true
+      live-migration-permit-post-copy: true
+      migration-auth-type: ssh
+      openstack-origin: cloud:bionic-train
+      reserved-host-memory: 16384
+      reserved-huge-pages: node:0,size:2048,count:64
+      restrict-ceph-pools: false
+      sysctl: |-
+        { net.ipv4.neigh.default.gc_thresh1 : 128,
+                net.ipv4.neigh.default.gc_thresh2 : 28672,
+                net.ipv4.neigh.default.gc_thresh3 : 32768,
+                net.ipv6.neigh.default.gc_thresh1 : 128,
+                net.ipv6.neigh.default.gc_thresh2 : 28672,
+                net.ipv6.neigh.default.gc_thresh3 : 32768,
+                net.nf_conntrack_max : 1000000,
+                net.netfilter.nf_conntrack_buckets : 204800,
+                net.netfilter.nf_conntrack_max : 1000000 }
+      use-internal-endpoints: true
+      vcpu-pin-set: 8-63
+      virt-type: kvm
+      virtio-net-rx-queue-size: 1024
+      virtio-net-tx-queue-size: 1024
+    annotations:
+      gui-x: "250"
+      gui-y: "250"
+    bindings:
+      "": internal-api
+      amqp: internal-api
+      ceph: storage-service
+      ceph-access: storage-service
+      cloud-compute: internal-api
+      cloud-credentials: internal-api
+      compute-peer: internal-api
+      ephemeral-backend: storage-service
+      image-service: internal-api
+      internal: internal-api
+      lxd: internal-api
+      migration: internal-api
+      neutron-plugin: internal-api
+      nova-ceilometer: internal-api
+      nrpe-external-master: internal-api
+      secrets-storage: storage-service
+  ntp:
+    charm: cs:ntp-39
+    options:
+      source: 145.145.72.8
+    annotations:
+      gui-x: "2368"
+      gui-y: "711.910161513775"
+    bindings:
+      "": alpha
+      juju-info: alpha
+      master: alpha
+      nrpe-external-master: alpha
+      ntp-peers: alpha
+      ntpmaster: alpha
+  openstack-dashboard:
+    charm: cs:openstack-dashboard-297
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      cinder-backup: false
+      default-role: member
+      endpoint-type: publicURL
+      neutron-network-firewall: false
+      neutron-network-l3ha: true
+      neutron-network-lb: true
+      openstack-origin: cloud:bionic-train
+      os-public-hostname: www.nfv.dcn.surf.net
+      password-retrieve: true
+      secret: encryptcookieswithme
+      vip: 145.145.72.110 10.0.92.110
+      webroot: /
+    annotations:
+      gui-x: "500"
+      gui-y: "-250"
+    bindings:
+      "": external-api
+      certificates: external-api
+      cluster: external-api
+      dashboard-plugin: external-api
+      ha: external-api
+      identity-service: external-api
+      nrpe-external-master: external-api
+      public: external-api
+      shared-db: internal-api
+      website: external-api
+      websso-fid-service-provider: external-api
+      websso-trusted-dashboard: external-api
+  placement:
+    charm: cs:placement-11
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      openstack-origin: cloud:bionic-train
+      os-admin-hostname: place.nfv.dcn.surf.net
+      os-internal-hostname: place.nfv.dcn.surf.net
+      os-public-hostname: place.nfv.dcn.surf.net
+      use-internal-endpoints: false
+      vip: 145.145.72.118 10.0.92.118
+      worker-multiplier: 0.25
+    annotations:
+      gui-x: "0"
+      gui-y: "500"
+    bindings:
+      "": internal-api
+      admin: internal-api
+      amqp: internal-api
+      certificates: internal-api
+      cluster: internal-api
+      ha: internal-api
+      identity-service: internal-api
+      internal: internal-api
+      placement: internal-api
+      public: external-api
+      shared-db: internal-api
+  rabbitmq-server:
+    charm: cs:rabbitmq-server-102
+    num_units: 3
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+    options:
+      min-cluster-size: 3
+      queue_thresholds: '[[\*, \*, 700, 800]]'
+      source: cloud:bionic-train
+    annotations:
+      gui-x: "500"
+      gui-y: "250"
+    bindings:
+      "": internal-api
+      amqp: internal-api
+      ceph: internal-api
+      certificates: internal-api
+      cluster: internal-api
+      ha: internal-api
+      nrpe-external-master: external-api
+  vpp-agent:
+    charm: local:bionic/vpp-10
+    bindings:
+      "": alpha
+      juju-info: alpha
+machines:
+  "0":
+    constraints: tags=virtual
+  "1":
+    constraints: tags=virtual
+  "2":
+    constraints: tags=virtual
+  "4": {}
+  "5": {}
+relations:
+- - ceph-osd:mon
+  - ceph-mon:osd
+- - mysql:ha
+  - hacluster-mysql:ha
+- - keystone:ha
+  - hacluster-keystone:ha
+- - glance:ha
+  - hacluster-glance:ha
+- - cinder:ha
+  - hacluster-cinder:ha
+- - neutron-api:ha
+  - hacluster-neutron:ha
+- - nova-cloud-controller:ha
+  - hacluster-nova:ha
+- - openstack-dashboard:ha
+  - hacluster-horizon:ha
+- - heat:ha
+  - hacluster-heat:ha
+- - cinder:shared-db
+  - mysql:shared-db
+- - cinder:identity-service
+  - keystone:identity-service
+- - cinder-ceph:ceph
+  - ceph-mon:client
+- - cinder-ceph:storage-backend
+  - cinder:storage-backend
+- - cinder:amqp
+  - rabbitmq-server:amqp
+- - glance:shared-db
+  - mysql:shared-db
+- - glance:identity-service
+  - keystone:identity-service
+- - glance:ceph
+  - ceph-mon:client
+- - glance:amqp
+  - rabbitmq-server:amqp
+- - heat:shared-db
+  - mysql:shared-db
+- - heat:identity-service
+  - keystone:identity-service
+- - heat:amqp
+  - rabbitmq-server:amqp
+- - nova-cloud-controller:shared-db
+  - mysql:shared-db
+- - nova-cloud-controller:amqp
+  - rabbitmq-server:amqp
+- - nova-cloud-controller:identity-service
+  - keystone:identity-service
+- - nova-cloud-controller:image-service
+  - glance:image-service
+- - neutron-api:shared-db
+  - mysql:shared-db
+- - neutron-api:amqp
+  - rabbitmq-server:amqp
+- - neutron-api:neutron-api
+  - nova-cloud-controller:neutron-api
+- - neutron-api:identity-service
+  - keystone:identity-service
+- - neutron-gateway:quantum-network-service
+  - nova-cloud-controller:quantum-network-service
+- - neutron-gateway:amqp
+  - rabbitmq-server:amqp
+- - neutron-gateway:neutron-plugin-api
+  - neutron-api:neutron-plugin-api
+- - openstack-dashboard:identity-service
+  - keystone:identity-service
+- - openstack-dashboard:shared-db
+  - mysql:shared-db
+- - glance:image-service
+  - cinder:image-service
+- - nova-compute:image-service
+  - glance:image-service
+- - nova-compute:cloud-compute
+  - nova-cloud-controller:cloud-compute
+- - nova-compute:juju-info
+  - ntp:juju-info
+- - nova-compute:amqp
+  - rabbitmq-server:amqp
+- - nova-compute:ceph
+  - ceph-mon:client
+- - nova-compute:ceph-access
+  - cinder-ceph:ceph-access
+- - placement:shared-db
+  - mysql:shared-db
+- - placement:identity-service
+  - keystone:identity-service
+- - placement:placement
+  - nova-cloud-controller:placement
+- - placement:ha
+  - hacluster-placement:ha
+- - mysql:shared-db
+  - keystone:shared-db
+- - vpp-agent:juju-info
+  - neutron-api:juju-info
+- - vpp-agent:juju-info
+  - nova-compute:juju-info

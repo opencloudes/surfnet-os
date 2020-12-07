@@ -1,0 +1,24 @@
+options:
+
+# Not defined yet.
+# Could be the settings for the kernel and interfaces
+# Format example.
+  hugepages:
+    type: string
+    default: "60000"
+    description: |
+      Hugepages configuration.
+  max_map_count:
+    type: string
+    default: "120000"
+    description: |
+      At least should be de double of hupages.
+  shmmax:
+    type: string
+    default: "1048576000000"
+    description: |
+      Shared Memory Max must be greater or equal to the total size of hugepages
+      For 2MB pages, TotalHugepageSize = vm.nr_hugepages * 2 * 1024 * 1024
+      If the existing kernel.shmmax setting  (cat /sys/proc/kernel/shmmax)
+      is greater than the calculated TotalHugepageSize then set this parameter
+      to current shmmax value.

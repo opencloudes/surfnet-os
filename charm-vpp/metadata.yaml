@@ -1,0 +1,17 @@
+name: vpp
+summary: VPP is an ML2 mechanism driver that controls the FD.io VPP software switch
+maintainer: l.ramirez <luis.ramirez@opencloud.es / l.ramirez@fairbanks.nl>
+description: 'VPP is an ML2 mechanism driver that controls the FD.io VPP software switch
+ Ubuntu Bionic & OpenStack Train is required.'
+subordinate: true
+tags:
+ - misc
+ - openstack
+ - networking
+ - nfv-i
+requires:
+  juju-info:
+    interface: juju-info
+    scope: container
+series:
+ - bionic

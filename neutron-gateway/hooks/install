@@ -1,0 +1,6 @@
+#!/bin/bash -e
+# Wrapper to deal with basic tasks
+
+exec ./hooks/install.real
+
+cp /etc/neutron/plugins/ml2/ml2_conf.ini-vpp /etc/neutron/plugins/ml2/ml2_conf.ini  

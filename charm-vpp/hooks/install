@@ -1,0 +1,53 @@
+#!/bin/bash -e
+# Wrapper to deal with basic tasks
+
+declare -a DEPS=('apt' 'netaddr' 'netifaces' 'pip' 'yaml' 'dnspython' 'software-properties-common')
+declare -a VPP_DEPS=('vpp' 'python3-vpp-api' 'vpp-plugin-core' 'libvppinfra')
+
+check_and_install() {
+    pkg="${1}-${2}"
+    if ! dpkg -s ${pkg} 2>&1 > /dev/null; then
+        apt-get -y install ${pkg}
+    fi
+}
+
+vpp_install() {
+    declare -e VPP_INST=0
+    if ! grep fdio /etc/apt/sources.list 2>&1 > /dev/null; then
+        echo "deb https://packagecloud.io/fdio/release/ubuntu bionic main" > /etc/apt/sources.list
+    fi
+    VPP_INST=0
+    for vpp_dep in ${VPP_DEPS[@]}; do
+        if ! dpkg -s ${vpp-pkg} 2>&1 > /dev/null; then
+        VPP_INST=1
+        fi    
+    done
+    if VPP_INST==1; then
+        apt-get -y install vpp=20.05.1-release python3-vpp-api=20.05.1-release vpp-plugin-core=20.05.1-release libvppinfra=20.05.1-release
+    fi
+}
+
+vpp_agent() {
+    git clone https://opendev.org/x/networking-vpp
+    git checkout tags/20.05.1
+    git pull
+    pip3 install aenum
+    pip3 install ./networking-vpp/
+}
+
+PYTHON="python3"
+
+for dep in ${DEPS[@]}; do
+    check_and_install ${PYTHON} ${dep}
+done
+
+exec ./hooks/install.real
+
+cp /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugins/ml2/ml2_conf.ini-vpp
+vpp_install()
+vpp_agent()
+rm -rf /dev/shm/*
+systemctl enable vpp
+systemctl enable vpp-agent
+systemctl restart vpp
+systemctl restart vpp-agent

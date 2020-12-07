@@ -1,0 +1,4 @@
+pause:
+    description: Pause the vpp unit.  This action will stop vpp services.
+resume:
+    descrpition: Resume the vpp unit.  This action will start vpp services.

@@ -1,0 +1,14 @@
+###############################################################################
+# [ WARNING ]
+# configuration file maintained by Juju
+# local changes will be overwritten.
+###############################################################################
+
+create int rdma host-if {{ int1 }} name rdma0 num-rx-queues 8 rx-queue-size 2048 tx-queue-size 16384
+create int rdma host-if {{ int2 }} name rdma1 num-rx-queues 8 rx-queue-size 2048 tx-queue-size 16384
+set interface state rdma1 up
+set interface state rdma0 up
+create bond mode lacp
+bond add BondEthernet0 rdma0
+bond add BondEthernet0 rdma1
+set int state BondEthernet0 up

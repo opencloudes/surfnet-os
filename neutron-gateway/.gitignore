@@ -1,0 +1,16 @@
+bin
+.coverage
+tags
+.tox
+.testrepository
+.stestr
+*.pyc
+*.sw[nop]
+*.pyc
+precise
+trusty
+wily
+xenial
+.unit-state.db
+func-results.json
+__pycache__
